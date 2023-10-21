@@ -10,12 +10,14 @@ from pocketsphinx import LiveSpeech
 import sys
 
 precursor = "hey john "
-thinking_options = ["Thinking", "Let me think", "Accessing database", "Just a second", "Analyzing data", "Searching for information", "Processing your request", "Considering possibilities", "Gathering information", "Calculating results"]
+thinking_options = ["Thinking", "Let me think", "Accessing database", "Just a second", "Searching for information", "Processing your request", "Considering responses", "Gathering information", "Finding results"]
 
 def check_stop():
-    speech = LiveSpeech(keyphrase='stop', kws_threshold=1e-20)
-    for _ in speech:
-        sys.exit()
+    speech = LiveSpeech()
+    for word in speech:
+        if "stop" in str(word):
+            print("Stop said!")
+            sys.exit()
 
 def speak(message):
     # Windows says message
@@ -32,11 +34,11 @@ def remove_precursor(input_string):
     # Removes all text before precursor, as well as the precursor
     index = input_string.index(precursor)
     return input_string[index:].replace(precursor, "")
-    
-r = sr.Recognizer()
-perplexity = Perplexity()
 
 def main():
+    r = sr.Recognizer()
+    perplexity = Perplexity()
+
     p1 = None
     p2 = None
     while True:
@@ -69,6 +71,9 @@ def main():
                         if not t.is_alive():
                             p2.terminate()
                         time.sleep(0.05)
+
+                    if t.is_alive():
+                        t.join()
 
         except sr.RequestError as e:
             print("Could not request results: {0}".format(e))
